@@ -56,7 +56,6 @@
       "dependsOn": [ ]
     },
     {
-      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Compute/virtualMachines/passwordbot'.",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
       "apiVersion": "2015-06-15",
@@ -137,7 +136,6 @@
         ]
     },
     {
-      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/networkInterfaces/passwordbot826'.",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[parameters('nicName')]",
       "apiVersion": "2015-06-15",
@@ -169,7 +167,6 @@
       ]
     },
     {
-      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/networkSecurityGroups/passwordbot'.",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[parameters('nsgName')]",
       "apiVersion": "2015-06-15",
@@ -207,7 +204,6 @@
       "dependsOn": [ ]
     },
     {
-      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/publicIPAddresses/passwordbot'.",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[parameters('publicIP')]",
       "apiVersion": "2015-06-15",
@@ -222,7 +218,6 @@
       "dependsOn": [ ]
     },
     {
-      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/virtualNetworks/passwordbotnet'.",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('vnetName')]",
       "apiVersion": "2015-06-15",
@@ -249,8 +244,7 @@
       "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]" ]
     },
     {
-      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Storage/storageAccounts/passwordbotrg9454'.",
-      "type": "Microsoft.Storage/storageAccounts",
+     "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('storageAccount')]",
       "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
