@@ -1,0 +1,264 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "adminUser": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "availabilitySet": {
+      "type": "string"
+    },
+    "vmName": {
+      "type": "string"
+    },
+    "nicName": {
+      "type": "string"
+    },
+    "nsgName": {
+      "type": "string"
+    },
+    "publicIP": {
+      "type": "string"
+    },
+    "vnetName": {
+      "type": "string"
+    },
+    "storageAccount": {
+      "type": "string"
+    },
+    "customScriptExtensionUri": {
+      "type": "string"
+    },
+    "customScriptExtensionCommand": {
+      "type": "string"
+    },
+    "installFileUri": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Compute/availabilitySets/passwordbotas'.",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySet')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "platformUpdateDomainCount": 5,
+        "platformFaultDomainCount": 3
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Compute/virtualMachines/passwordbot'.",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('vmName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_DS1_v2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2012-R2-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[parameters('vmName')]",
+            "createOption": "FromImage",
+            "vhd": {
+              "uri": "[concat('https', '://', parameters('storageAccount'), '.blob.core.windows.net', concat('/vhds/', parameters('vmName'),'.vhd'))]"
+            },
+            "caching": "ReadWrite"
+          },
+          "dataDisks": [ ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('adminUser')]",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          },
+          "secrets": [ ],
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('nicName'))]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('nicName'))]"
+      ],
+        "resources": [
+          {
+            "name": "CustomScriptExtension",
+            "type": "extensions",
+            "location": "[parameters('location')]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+            ],
+            "tags": {
+              "displayName": "extension"
+            },
+            "properties": {
+              "publisher": "Microsoft.Compute",
+              "type": "CustomScriptExtension",
+              "typeHandlerVersion": "1.4",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": [
+                  "[parameters('customScriptExtensionUri')]",
+                  "[parameters('installFileUri')]"
+                ],
+                "commandToExecute": "[parameters('customScriptExtensionCommand')]"
+              }
+            }
+          }
+        ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/networkInterfaces/passwordbot826'.",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('nicName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.0.0.4",
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIP'))]"
+              },
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/api')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [ ]
+        },
+        "enableIPForwarding": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIP'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/networkSecurityGroups/passwordbot'.",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('nsgName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "BotApi",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "81",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/publicIPAddresses/passwordbot'.",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('publicIP')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4,
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('vmName')]"
+        }
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Network/virtualNetworks/passwordbotnet'.",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnetName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "api",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+              }
+            }
+            
+          }
+        ]
+      },
+      "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]" ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/f3702679-75f9-4eba-9d05-b74acef63e40/resourceGroups/passwordbotrg/providers/Microsoft.Storage/storageAccounts/passwordbotrg9454'.",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccount')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "tags": { },
+      "properties": {
+        "accountType": "Premium_LRS"
+      },
+      "dependsOn": [ ]
+    }
+  ]
+}
