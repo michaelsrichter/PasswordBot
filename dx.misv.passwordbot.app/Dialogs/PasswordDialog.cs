@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using dx.misv.passwordbot.app.Controllers;
 using dx.misv.passwordbot.app.Services;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
-using RestSharp;
+using Microsoft.Practices.Unity;
 
 namespace dx.misv.passwordbot.app.Dialogs
 {
@@ -17,14 +15,20 @@ namespace dx.misv.passwordbot.app.Dialogs
     public class PasswordDialog : LuisDialog<object>
     {
         private IWordService _wordService;
+        internal int Count;
 
-        [Microsoft.Practices.Unity.Dependency]
+        [Dependency]
         public IWordService WordService
         {
             get { return _wordService; }
             set { _wordService = value; }
         }
 
+        //[LuisIntent("Remember Password")]
+        //public async Task RememberPassword(IDialogContext context, LuisResult result)
+        //{
+        //    return Chain.From()
+        //}
         [LuisIntent("Send Password")]
         public async Task GetPassword(IDialogContext context, LuisResult result)
         {
@@ -39,16 +43,15 @@ namespace dx.misv.passwordbot.app.Dialogs
                 number = new EntityRecommendation(type: "builtin.number") {Entity = "1"};
             }
 
-            int digit;
-            var isDigit = int.TryParse(number.Entity, out digit);
+            var isDigit = int.TryParse(number.Entity, out Count);
             if (!isDigit)
             {
-                digit = (int) Utility.ToLong(number.Entity);
+                Count = (int) Utility.ToLong(number.Entity);
             }
-            var supportedStrength = "strong";
+            var supportedStrength = string.Empty;
             if (!string.IsNullOrEmpty(strength.Entity))
             {
-                var supportedStrengths = new[] { "simple", "strong", "complex" };
+                var supportedStrengths = Utility.PasswordStrengths();
 
                 supportedStrength = supportedStrengths.FirstOrDefault(s => _wordService.IsSynonym(strength.Entity, s));
             }
@@ -56,19 +59,32 @@ namespace dx.misv.passwordbot.app.Dialogs
 
             if (!string.IsNullOrEmpty(supportedStrength))
             {
-                var client = new RestClient("http://localhost:1606");
-                // client.Authenticator = new HttpBasicAuthenticator(username, password);
-
-                var request = new RestRequest($"api/v1/{supportedStrength}", Method.GET);
-                var restResponse = await client.ExecuteTaskAsync<List<string>>(request);
-                await context.PostAsync($"You asked for {digit} {supportedStrength} password: {restResponse.Data[0]}");
+                await PrintPassword(context, supportedStrength, Count);
             }
             else
             {
-                await context.PostAsync($"You asked for {digit} {supportedStrength} password: ");
+                PromptDialog.Choice(context,
+                    PasswordStrengthChosen,
+                    Utility.PasswordStrengths(),
+                    "Sure. How strong do you want your passwords?");
             }
+        }
+
+        private async Task PrintPassword(IDialogContext context, string strength, int count)
+        {
+            var passwords = await Utility.PasswordAPIRequest(strength, count.ToString());
+            var multi = count > 1 ? "s" : string.Empty;
+            await
+                context.PostAsync(
+                    $"You asked for {count} {strength} password{multi}. Here you go: {string.Join(", ", passwords)}");
 
             context.Wait(MessageReceived);
+        }
+
+        public async Task PasswordStrengthChosen(IDialogContext context, IAwaitable<string> result)
+        {
+            var strength = await result;
+            await PrintPassword(context, strength, Count);
         }
 
 

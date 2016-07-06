@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using RestSharp;
 
-namespace dx.misv.passwordbot.app.Controllers
+namespace dx.misv.passwordbot.app
 {
     public static class Utility
     {
@@ -71,6 +73,22 @@ namespace dx.misv.passwordbot.app.Controllers
                 StringComparison.InvariantCultureIgnoreCase)
                 ? -1
                 : 1);
+        }
+
+        public static async Task<IEnumerable<string>> PasswordAPIRequest(string strength, string count)
+        {
+            var client = new RestClient("http://localhost:1606");
+            // client.Authenticator = new HttpBasicAuthenticator(username, password);
+
+            var request = new RestRequest($"api/v1/{strength}/{count}", Method.GET);
+            var restResponse = await client.ExecuteTaskAsync<List<string>>(request);
+            return restResponse.Data;
+
+        }
+
+        public static IEnumerable<string> PasswordStrengths()
+        {
+            return new[] {"simple", "strong", "complex"};
         }
     }
 }

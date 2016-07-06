@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Http;
 using dx.misv.passwordbot.app.Dialogs;
 using Microsoft.Bot.Builder.Dialogs;
@@ -10,7 +9,6 @@ namespace dx.misv.passwordbot.app.Controllers
     [BotAuthentication]
     public class MessagesController : ApiController
     {
-   
         /// <summary>
         ///     POST: api/Messages
         ///     Receive a message from a user and reply to it
@@ -20,8 +18,10 @@ namespace dx.misv.passwordbot.app.Controllers
             if (message.Type == "Message")
             {
                 // return our reply to the user
-                return await Conversation.SendAsync(message, () => (IDialog<object>) Configuration.DependencyResolver.GetService(typeof(PasswordDialog)));
-                
+                return
+                    await
+                        Conversation.SendAsync(message,
+                            () => (IDialog<object>) Configuration.DependencyResolver.GetService(typeof(PasswordDialog)));
             }
             return HandleSystemMessage(message);
         }
