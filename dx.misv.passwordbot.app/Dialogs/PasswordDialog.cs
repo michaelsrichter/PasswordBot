@@ -7,6 +7,7 @@ using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using Microsoft.Practices.Unity;
+using Microsoft.Bot.Builder.FormFlow;
 
 namespace dx.misv.passwordbot.app.Dialogs
 {
@@ -24,11 +25,21 @@ namespace dx.misv.passwordbot.app.Dialogs
             set { _wordService = value; }
         }
 
-        //[LuisIntent("Remember Password")]
-        //public async Task RememberPassword(IDialogContext context, LuisResult result)
-        //{
-        //    return Chain.From()
-        //}
+
+
+        [LuisIntent("Remember Password")]
+        public async Task RememberPassword(IDialogContext context, LuisResult result)
+        {
+           context.Call(FormDialog.FromForm(PasswordRecord.BuildForm, FormOptions.PromptInStart), PasswordRecordFormComplete);
+        }
+
+        internal async Task PasswordRecordFormComplete(IDialogContext context, IAwaitable<PasswordRecord> result)
+        {
+            var r = await result;
+            await context.PostAsync("I'll remember this password for " + r.Service);
+            context.Wait(MessageReceived);
+        }
+
         [LuisIntent("Send Password")]
         public async Task GetPassword(IDialogContext context, LuisResult result)
         {
@@ -121,6 +132,22 @@ namespace dx.misv.passwordbot.app.Dialogs
                 await context.PostAsync("Did not reset count.");
             }
             context.Wait(MessageReceivedAsync);
+        }
+    }
+
+    [Serializable]
+    public class PasswordRecord
+    {
+        public string Password { get; set; }
+        public string Service { get; set; }
+        public string Username { get; set; }
+        public string Note { get; set; }
+        public string Project { get; set; }
+        public static IForm<PasswordRecord> BuildForm()
+        {
+            return new FormBuilder<PasswordRecord>()
+                    .Message("Sure, I'll remember your password (you can trust me!)")
+                    .Build();
         }
     }
 }
