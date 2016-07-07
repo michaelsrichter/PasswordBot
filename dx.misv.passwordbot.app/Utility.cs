@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using RestSharp;
@@ -77,10 +79,10 @@ namespace dx.misv.passwordbot.app
 
         public static async Task<IEnumerable<string>> PasswordAPIRequest(string strength, string count)
         {
-            var client = new RestClient("http://localhost:1606");
-            // client.Authenticator = new HttpBasicAuthenticator(username, password);
-
-            var request = new RestRequest($"api/v1/{strength}/{count}", Method.GET);
+            var client = new RestClient(ConfigurationManager.AppSettings["PasswordBotApiUrl"]);
+            var request =
+                new RestRequest(string.Format(ConfigurationManager.AppSettings["PasswordBotApiPath"], strength, count),
+                    Method.GET);
             var restResponse = await client.ExecuteTaskAsync<List<string>>(request);
             return restResponse.Data;
 
@@ -89,6 +91,23 @@ namespace dx.misv.passwordbot.app
         public static IEnumerable<string> PasswordStrengths()
         {
             return new[] {"simple", "strong", "complex"};
+        }
+
+        public static string ToMarkdownList(this IEnumerable<string> items, bool unordered = true)
+        {
+            var itemsArray = items.ToArray();
+            var sb = new StringBuilder();
+            sb.AppendLine();
+            var bullet = "*";
+            for (var i = 0; i < itemsArray.Length; i++)
+            {
+                if (!unordered)
+                {
+                    bullet = (i + 1).ToString();
+                }
+                sb.AppendFormat("{0} {1}\r\n", bullet, itemsArray[i]);
+            }
+            return sb.ToString();
         }
     }
 }
