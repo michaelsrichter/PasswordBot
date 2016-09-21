@@ -124,6 +124,42 @@ namespace dx.misv.passwordbot.core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to complex
+        ///compound
+        ///difficult
+        ///analyzable
+        ///Byzantine
+        ///colonial
+        ///complicated
+        ///composite
+        ///compound
+        ///convoluted
+        ///daedal
+        ///decomposable
+        ///Gordian
+        ///interlacing
+        ///interlinking
+        ///interlocking
+        ///interwoven
+        ///intricate
+        ///involved
+        ///knotty
+        ///labyrinthian
+        ///labyrinthine
+        ///mazy
+        ///multifactorial
+        ///multiplex
+        ///tangled
+        ///thickening
+        ///tortuous.
+        /// </summary>
+        internal static string complex {
+            get {
+                return ResourceManager.GetString("complex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to abada
         ///abaia
         ///abath
@@ -185,6 +221,124 @@ namespace dx.misv.passwordbot.core.Properties {
         internal static string nouns {
             get {
                 return ResourceManager.GetString("nouns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to elementary
+        ///uncomplicated
+        ///unproblematic
+        ///childlike
+        ///wide-eyed
+        ///round-eyed
+        ///dewy-eyed
+        ///dim-witted
+        ///simple-minded
+        ///unsubdivided
+        ///bare
+        ///half-witted
+        ///mere
+        ///simple
+        ///unsubdivided
+        ///easy
+        ///plain
+        ///smooth
+        ///uncomplicated
+        ///acerate
+        ///acerose
+        ///acicular
+        ///acuminate
+        ///apiculate
+        ///arrow-shaped
+        ///bladelike
+        ///caudate
+        ///cordate
+        ///cordiform
+        ///cuneate
+        ///deltoid
+        ///dolabrate
+        ///dolabriform
+        ///easy
+        ///elliptic
+        ///elongate
+        ///ensiform
+        ///hastate
+        ///lancelike
+        ///lanceolate
+        ///linear
+        ///lyrate
+        ///naif
+        ///naive
+        ///needled
+        ///oblanceolate
+        ///oblong
+        ///obovate
+        ///obtuse
+        ///orbicular        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string simple {
+            get {
+                return ResourceManager.GetString("simple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to strong
+        ///potent
+        ///stiff
+        ///impregnable
+        ///inviolable
+        ///secure
+        ///unassailable
+        ///unattackable
+        ///solid
+        ///substantial
+        ///hard
+        ///warm
+        ///firm
+        ///effective
+        ///effectual
+        ///efficacious
+        ///fertile
+        ///powerful
+        ///robust
+        ///rugged
+        ///tough
+        ///toughened
+        ///stiff
+        ///hard
+        ///alcoholic
+        ///beardown
+        ///beefed-up
+        ///brawny
+        ///bullnecked
+        ///bullocky
+        ///equipotent
+        ///forceful
+        ///fortified
+        ///fresh
+        ///hefty
+        ///industrial-strength
+        ///intense
+        ///invulnerable
+        ///ironlike
+        ///irregular
+        ///knock-down
+        ///knockout
+        ///multipotent
+        ///muscular
+        ///noticeable
+        ///powerful
+        ///reinforced
+        ///robust
+        ///severe
+        ///sinewy
+        ///sound
+        ///stren [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string strong {
+            get {
+                return ResourceManager.GetString("strong", resourceCulture);
             }
         }
     }
